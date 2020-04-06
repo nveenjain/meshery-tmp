@@ -75,27 +75,20 @@ jobs:
 #       with:
 #         go-version: ${{ secrets.GO_VERSION }}
 #     - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go get github.com/securego/gosec/cmd/gosec; /home/runner/go/bin/gosec ./... # https://github.com/securego/gosec
-  tests:
-    # needs: [lint, error_check, static_check, vet, sec_check]
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out code
-      uses: actions/checkout@master
-      with:
-        fetch-depth: 1
-    - name: Setup Go
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{ secrets.GO_VERSION }}
-    - name: KinD (Kubernetes in Docker) Action
-      uses: engineerd/setup-kind@v0.3.0
-      with:
-        version: "v0.7.0"
-      run: |
-        kubectl cluster-info
-        env
-    - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go test -tags draft ./...
+#   tests:
+#     # needs: [lint, error_check, static_check, vet, sec_check]
+#     name: Tests
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Check out code
+#       uses: actions/checkout@master
+#       with:
+#         fetch-depth: 1
+#     - name: Setup Go
+#       uses: actions/setup-go@v1
+#       with:
+#         go-version: ${{ secrets.GO_VERSION }}
+#     - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go test -tags draft ./...
   build:
     name: Meshery build check
     runs-on: ubuntu-latest
