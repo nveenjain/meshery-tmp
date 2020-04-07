@@ -14,7 +14,8 @@ builds:
   env:
     - CGO_ENABLED=0
   ldflags:
-    - -s -w -X main.version={{.Version}} main.commit={{.Commit}}
+    - -s -w -X main.version={{.Version}} 
+    - -s -w -X main.commit={{.Commit}}
 
   # GOOS list to build for.
   # For more info refer to: https://golang.org/doc/install/source#environment
@@ -28,8 +29,8 @@ builds:
   # # GOARCH to build for.
   # # For more info refer to: https://golang.org/doc/install/source#environment
   # # Defaults are 386 and amd64.
-  goarch:
-    - amd64
+  # goarch:
+  #   - amd64
   #   - arm
   #   - arm64
 archives:
