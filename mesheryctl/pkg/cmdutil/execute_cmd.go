@@ -25,7 +25,7 @@ func EmptyRun(*cobra.Command, []string) {}
 
 // ExecuteCommand run the command and return output
 func ExecuteCommand(root *cobra.Command, args ...string) (string, error) {
-	_, output, err = executeCommandC(root, args...)
+	_, output, err := executeCommandC(root, args...)
 	return output, err
 }
 
@@ -34,7 +34,7 @@ func executeCommandC(root *cobra.Command, args ...string) (*cobra.Command, strin
 	root.SetOut(buf)
 	root.SetErr(buf)
 	root.SetArgs(args)
-	c, err := root.Execute()
+	c, err := root.ExecuteC()
 
 	return c, buf.String(), err
 }
