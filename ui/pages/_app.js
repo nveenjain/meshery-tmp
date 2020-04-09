@@ -20,7 +20,7 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 
 // codemirror + js-yaml imports when added to a page was preventing to navigating to that page using nextjs 
-// link clicks, hence attemtpting to add them here
+// link clicks, hence attempting to add them here
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/addon/lint/lint.css';
@@ -216,6 +216,7 @@ let theme = createMuiTheme({
         color: '#737373',
       },
       footerText: {
+        cursor: 'pointer',
         display: 'inline',
         verticalAlign: 'middle',
       },
@@ -223,9 +224,6 @@ let theme = createMuiTheme({
         display: 'inline',
         verticalAlign: 'top',
       },
-      extl5: {
-        cursor: 'pointer',
-      }, 
       icon: {
         fontSize: 20,
       },
@@ -315,6 +313,27 @@ class MesheryApp extends App {
           }
           store.dispatch({ type: actionTypes.UPDATE_PROMETHEUS_CONFIG, prometheus: result.prometheus });
         }
+        if(result.loadTestPrefs){
+          if(typeof result.loadTestPrefs.c === 'undefined'){
+            result.loadTestPrefs.c = 0;
+          }
+          if(typeof result.loadTestPrefs.qps === 'undefined'){
+            result.loadTestPrefs.qps = 0;
+          }
+          if(typeof result.loadTestPrefs.t === 'undefined'){
+            result.loadTestPrefs.t = '30s';
+          }
+          if(typeof result.loadTestPrefs.gen === 'undefined'){
+            result.loadTestPrefs.gen = '';
+          }
+          store.dispatch({ type: actionTypes.UPDATE_LOAD_GEN_CONFIG, loadTestPref: result.loadTestPrefs });
+        }
+        if(typeof result.anonymousUsageStats !== 'undefined'){
+          store.dispatch({ type: actionTypes.UPDATE_ANONYMOUS_USAGE_STATS, anonymousUsageStats: result.anonymousUsageStats });
+        }
+        if(typeof result.anonymousPerfResults !== 'undefined'){
+          store.dispatch({ type: actionTypes.UPDATE_ANONYMOUS_PERFORMANCE_RESULTS, anonymousPerfResults: result.anonymousPerfResults });
+        }
       }
       }, error => {
         console.log(`there was an error fetching user config data: ${error}`);
@@ -381,7 +400,7 @@ class MesheryApp extends App {
                               <footer className={classes.footer}>
                                 <Typography variant="body2" align="center" color="textSecondary" component="p">
                                  <span onClick={this.handleL5CommunityClick} className={classes.footerText}>
-                                   Built with <FavoriteIcon className={classes.footerIcon} /> by the <span className={classes.extl5}> Layer5 Community</span></span>
+                                   Built with <FavoriteIcon className={classes.footerIcon} /> by the Layer5 Community</span>
                                 </Typography>
                               </footer>
                             </div>

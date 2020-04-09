@@ -12,6 +12,7 @@ import Paper from '@material-ui/core/Paper';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import NoSsr from '@material-ui/core/NoSsr';
 import dataFetch from '../lib/data-fetch';
+import { withRouter } from 'next/router';
 
 
 const styles = theme => ({
@@ -42,6 +43,10 @@ class User extends React.Component {
     window.location = "/logout";
   };
 
+  handlePreference = () => {
+    this.props.router.push('/userpreference');
+  };
+
   componentDidMount() {
     // console.log("fetching user data");
     dataFetch('/api/user', { credentials: 'same-origin' }, user => {
@@ -62,28 +67,32 @@ class User extends React.Component {
       user_id = this.state.user.user_id;
     }
     const { open } = this.state;
+    // if (user_id === 'meshery') { // indicating a local user
+    //   return null;
+    // }
     return (
       <div>
         <NoSsr>
           <IconButton color={color} className={iconButtonClassName} 
-          buttonRef={node => {
-            this.anchorEl = node;
-          }}
-          aria-owns={open ? 'menu-list-grow' : undefined}
-          aria-haspopup="true"
-          onClick={this.handleToggle}>
+            buttonRef={node => {
+              this.anchorEl = node;
+            }}
+            aria-owns={open ? 'menu-list-grow' : undefined}
+            aria-haspopup="true"
+            onClick={this.handleToggle}>
             <Avatar className={avatarClassName}  src={avatar_url} />
           </IconButton>
-              <Popper open={open} anchorEl={this.anchorEl} transition disablePortal placement='top-end'>
-                {({ TransitionProps, placement }) => (
-                <Grow
-                  {...TransitionProps}
-                  id="menu-list-grow"
-                  style={{ transformOrigin: placement === 'bottom' ? 'left top' : 'left bottom' }}
-                >
+          <Popper open={open} anchorEl={this.anchorEl} transition disablePortal placement='top-end'>
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                id="menu-list-grow"
+                style={{ transformOrigin: placement === 'bottom' ? 'left top' : 'left bottom' }}
+              >
                 <Paper className={classes.popover}>
                   <ClickAwayListener onClickAway={this.handleClose}>
                     <MenuList>
+                      <MenuItem onClick={this.handlePreference}>Preferences</MenuItem>
                       <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
                     </MenuList>
                   </ClickAwayListener>
@@ -91,8 +100,8 @@ class User extends React.Component {
               </Grow>
             )}
           </Popper>
-          </NoSsr>
-    </div>
+        </NoSsr>
+      </div>
     )
   }
 }
@@ -106,4 +115,4 @@ const mapDispatchToProps = dispatch => {
 export default withStyles(styles)(connect(
   null,
   mapDispatchToProps
-)(User));
+)(withRouter(User)));
