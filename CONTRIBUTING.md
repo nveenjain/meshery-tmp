@@ -13,32 +13,10 @@ Not sure where to start? First, see the [newcomers welcome guide](https://docs.g
   - <a href="#contributing-meshery">Meshery Backend</a>
     - <a href="#adapter">Writing a Meshery Adapter</a>
   - <a href="#contributing-ui">Meshery UI</a>
-
+Relevant coding style guidelines are the Go Code Review Comments and the Formatting and style section of Peter Bourgon's Go: Best Practices for Production Environments.
 # <a name="contributing">General Contribution Flow</a>
-<!--
-Whether contributing to Meshery's backend, frontend or documentation, the process of contributing follows this flow:
-1. Get a local copy of the documentation.
-`git clone https://github.com/layer5io/meshery`
-1. Create and checkout a new branch to make changes within.
-`git checkout -b <my-changes>`
-1. Make, save, build, and test changes.
-1. Commit and push changes to your remote branch. Be sure to sign your commits ([see DCO requirement](#dco)).
-`git push origin <my-changes>`
-1. Open a pull request (in your web browser) against the master branch on https://github.com/layer5io/meshery.
--->
 
-In order to contribute updates to Meshery, please follow the fork and pull request workflow described [here](./git-workflow.md).
-
-<!--
-## <a name="sync-to-master">Keep local branch up to HEAD on master</a>
-Contributors who checkout a feature branch to from master regularly fall prey to errant code changes showing up in their subsequent pull requests based on other contributors' PRs being merged with new changes. The following commands will pull new changes from the master branch into your local branch, effectiving syncing your local branch with the latest changes in master:
-```
-git checkout master  // switch to master branch; checkout master locally.
-git pull // fetch latest changes remote master branch.
-git checkout <YOUR LOCAL BRANCH>` // switch to your local dev branch.
-git merge master // integrate changes from master into your local dev branch.
-```
--->
+In order to contribute to Meshery, please follow the fork-and-pull request workflow described [here](./git-workflow.md).
 
 ## <a name="commit-signing">Signing-off on Commits (Developer Certificate of Origin)</a>
 
@@ -46,8 +24,8 @@ To contribute to this project, you must agree to the Developer Certificate of
 Origin (DCO) for each commit you make. The DCO is a simple statement that you,
 as a contributor, have the legal right to make the contribution.
 
-See the [DCO](https://developercertificate.org) file for the full text of what you must agree to.
-
+See the [DCO](https://developercertificate.org) file for the full text of what you must agree to
+and how it works [here](https://github.com/probot/dco#how-it-works).
 To signify that you agree to the DCO for contributions, you simply add a line to each of your
 git commit messages:
 
@@ -79,7 +57,6 @@ Or you may configure your IDE, for example, Visual Studio Code to automatically 
 Please contribute! Meshery documentation uses GitHub Pages to host the docs site. Learn more about [Meshery's documentation framework](https://docs.google.com/document/d/17guuaxb0xsfutBCzyj2CT6OZiFnMu9w4PzoILXhRXSo/edit?usp=sharing). The process of contributing follows this flow:
 
 1. Create a fork, if you have not already, by following the steps described [here](./git-workflow.md)
-<!--`git clone https://github.com/layer5io/meshery`-->
 1. In the local copy of your fork, navigate to the docs folder.
 `cd docs`
 1. Create and checkout a new branch to make changes within
@@ -96,26 +73,30 @@ Please contribute! Meshery documentation uses GitHub Pages to host the docs site
 ## <a name="contributing-meshery">Meshery Contribution Flow</a>
 Meshery is written in `Go` (Golang) and leverages Go Modules. UI is built on React and Next.js. To make building and packaging easier a `Makefile` is included in the main repository folder.
 
+Relevant coding style guidelines are the [Go Code Review Comments](https://code.google.com/p/go-wiki/wiki/CodeReviewComments) and the _Formatting and style_ section of Peter Bourgon's [Go: Best 
+Practices for Production Environments](https://peter.bourgon.org/go-in-production/#formatting-and-style).
+
 __Please note__: All `make` commands should be run in a terminal from within the Meshery's main folder.
 
 ### Prerequisites for building Meshery in your development environment:
 1. `Go` version 1.11+ installed if you want to build and/or make changes to the existing code.
 1. `GOPATH` environment variable should be configured appropriately
-1. `npm` and `node` should be installed your machine, preferrably the latest versions.
-1. Fork this repository (`git clone https://github.com/layer5io/meshery.git`), clone your forked version of Meshery to your local, preferrably outside `GOPATH`. If you happen to checkout Meshery inside your `GOPATH` and you have version of `Go` prior to version 1.13, please set an environment variable `GO111MODULE=on` to enable GO Modules.
+1. `npm` and `node` should be installed your machine, preferably the latest versions.
+1. Fork this repository (`git clone https://github.com/layer5io/meshery.git`), clone your forked version of Meshery to your local, preferably outside `GOPATH`. If you happen to checkout Meshery inside your `GOPATH` and you have version of `Go` prior to version 1.13, please set an environment variable `GO111MODULE=on` to enable GO Modules.
 
 #### Build and run Meshery server
 To build & run the Meshery server code, run the following command:
-```
+```sh
 make run-local
 ```
 
 Any time changes are made to the GO code, you will have to stop the server and run the above command again.
 Once the Meshery server is up and running, you should be able to access Meshery on your `localhost` on port `9081` at `http://localhost:9081`. One thing to note, you might NOT see the [Meshery UI](#contributing-ui) until the UI code is built as well.
+After running Meshery server, you will need to select your **Cloud Provider** by navigating to `localhost:9081`. Only then you will be able to use the Meshery UI on port `3000`.
 
 #### Building Docker image
 To build a Docker image of Meshery, please ensure you have `Docker` installed to be able to build the image. Now, run the following command to build the Docker image:
-```
+```sh
 make docker
 ```
 
@@ -162,9 +143,29 @@ make run-ui-dev
 Once you have the server up and running, you will be able to access the Meshery UI at `http://localhost:3000`. One thing to note is that for the UI dev server to work, you need Meshery server running on the default port of `9081`.
 Any UI changes made now will automatically be recompiled and served in the browser.
 
-# <a name="maintaining"> Maintaining</a>
+### Running Meshery from IDE
+If you want to run Meshery from IDE like Goland, VSCode. set below environment variable
+```
+SAAS_BASE_URL=https://meshery.layer5.io
+PORT=9081
+DEBUG=true
+ADAPTER_URLS=mesherylocal.layer5.io:10000 mesherylocal.layer5.io:10001 mesherylocal.layer5.io:10002 mesherylocal.layer5.io:10003 mesherylocal.layer5.io:10004
+```
+go tool argument
+```shell
+-tags draft
+```
+update /etc/hosts
+```shell
+127.0.0.1 mesherylocal.layer5.io
+```
+
+# <a name="maintaining"> Reviews</a>
 All contributors are invited to review pull requests. See this short video on [how to review a pull request](https://www.youtube.com/watch?v=isLfo7jfE6g&feature=youtu.be).
 
-# License
+# New to Git?
+Resources: https://lab.github.com and https://try.github.com/
+
+### License
 
 This repository and site are available as open source under the terms of the [Apache 2.0 License](https://opensource.org/licenses/Apache-2.0).

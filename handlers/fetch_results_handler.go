@@ -2,24 +2,21 @@ package handlers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 
+	"github.com/gofrs/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/layer5io/meshery/models"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 // FetchResultsHandler fetchs pages of results from SaaS and presents it to the UI
-func (h *Handler) FetchResultsHandler(w http.ResponseWriter, req *http.Request, session *sessions.Session, user *models.User) {
+func (h *Handler) FetchResultsHandler(w http.ResponseWriter, req *http.Request, session *sessions.Session, _ *models.Preference, user *models.User, p models.Provider) {
 	if req.Method != http.MethodGet {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-
-	tokenVal, _ := session.Values[h.config.SaaSTokenName].(string)
-
 	// TODO: may be force login if token not found?????
 
 	err := req.ParseForm()
@@ -30,59 +27,52 @@ func (h *Handler) FetchResultsHandler(w http.ResponseWriter, req *http.Request, 
 	}
 	q := req.Form
 
-	bdr, err := h.getResultsFromSaaS(h.config.SaaSTokenName, tokenVal, q.Get("page"), q.Get("pageSize"), q.Get("search"), q.Get("order"))
+	bdr, err := p.FetchResults(req, q.Get("page"), q.Get("pageSize"), q.Get("search"), q.Get("order"))
 	if err != nil {
 		http.Error(w, "error while getting load test results", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("content-type", "application/json")
 	_, _ = w.Write(bdr)
 }
 
-func (h *Handler) getResultsFromSaaS(tokenKey, tokenVal, page, pageSize, search, order string) ([]byte, error) {
-	logrus.Infof("attempting to fetch results from SaaS")
-	saasURL, _ := url.Parse(h.config.SaaSBaseURL + "/results")
-	q := saasURL.Query()
-	if page != "" {
-		q.Set("page", page)
+// GetResultHandler gets an individual result from provider
+func (h *Handler) GetResultHandler(w http.ResponseWriter, req *http.Request, session *sessions.Session, _ *models.Preference, user *models.User, p models.Provider) {
+	if req.Method != http.MethodGet {
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
-	if pageSize != "" {
-		q.Set("page_size", pageSize)
+	// TODO: may be force login if token not found?????
+	id := req.URL.Query().Get("id")
+	if id == "" {
+		logrus.Errorf("Error: no id provided to get result")
+		http.Error(w, "please provide a result id", http.StatusBadRequest)
+		return
 	}
-	if search != "" {
-		q.Set("search", search)
-	}
-	if order != "" {
-		q.Set("order", order)
-	}
-	saasURL.RawQuery = q.Encode()
-	logrus.Debugf("constructed results url: %s", saasURL.String())
-	req, _ := http.NewRequest(http.MethodGet, saasURL.String(), nil)
-	req.AddCookie(&http.Cookie{
-		Name:     tokenKey,
-		Value:    tokenVal,
-		Path:     "/",
-		HttpOnly: true,
-		Domain:   saasURL.Hostname(),
-	})
-	c := &http.Client{}
-	resp, err := c.Do(req)
-	if err != nil {
-		logrus.Errorf("unable to get results: %v", err)
-		return nil, err
-	}
-	defer func() {
-		_ = resp.Body.Close()
-	}()
-	bdr, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		logrus.Errorf("unable to read response body: %v", err)
-		return nil, err
+	key := uuid.FromStringOrNil(id)
+	if key == uuid.Nil {
+		logrus.Errorf("Error: invalid id provided to get result")
+		http.Error(w, "please provide a valid result id", http.StatusBadRequest)
+		return
 	}
 
-	if resp.StatusCode == http.StatusOK {
-		logrus.Infof("results successfully retrieved from SaaS")
-		return bdr, nil
+	bdr, err := p.GetResult(req, key)
+	if err != nil {
+		http.Error(w, "error while getting load test results", http.StatusInternalServerError)
+		return
 	}
-	logrus.Errorf("error while fetching results: %s", bdr)
-	return nil, fmt.Errorf("error while sending results - Status code: %d, Body: %s", resp.StatusCode, bdr)
+	sp, err := bdr.ConvertToSpec()
+	if err != nil {
+		http.Error(w, "error while getting load test results", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("content-type", "application/yaml")
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="result_%s.yaml"`, bdr.ID))
+	b, err := yaml.Marshal(sp)
+	if err != nil {
+		logrus.Errorf("Error: unable to marshal result: %v", err)
+		http.Error(w, "error while getting test result", http.StatusInternalServerError)
+		return
+	}
+	_, _ = w.Write(b)
 }

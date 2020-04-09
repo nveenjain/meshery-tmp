@@ -22,7 +22,13 @@ import (
 	"github.com/vmihailenco/taskq/memqueue"
 )
 
+var globalTokenForAnonymousResults string
+
 func main() {
+	if globalTokenForAnonymousResults != "" {
+		models.GlobalTokenForAnonymousResults = globalTokenForAnonymousResults
+	}
+
 	ctx := context.Background()
 
 	viper.AutomaticEnv()
@@ -52,11 +58,6 @@ func main() {
 	}
 	logrus.Infof("Log level: %s", logrus.GetLevel())
 
-	saasBaseURL := viper.GetString("SAAS_BASE_URL")
-	if saasBaseURL == "" {
-		logrus.Fatalf("SAAS_BASE_URL environment variable not set.")
-	}
-
 	adapterURLs := viper.GetStringSlice("ADAPTER_URLS")
 
 	adapterTracker := helpers.NewAdaptersTracker(adapterURLs)
@@ -67,44 +68,77 @@ func main() {
 	// fileSessionStore := sessions.NewFilesystemStore("", []byte("Meshery"))
 	// fileSessionStore.MaxLength(0)
 
-	cookieSessionStore := sessions.NewCookieStore([]byte("Meshery"))
-
 	queueFactory := memqueue.NewFactory()
 	mainQueue := queueFactory.NewQueue(&taskq.QueueOptions{
 		Name: "loadTestReporterQueue",
 	})
 
-	// sessionPersister := helpers.NewFileSessionPersister(viper.GetString("USER_DATA_FOLDER"))
-	// sessionPersister, err := helpers.NewBadgerSessionPersister(viper.GetString("USER_DATA_FOLDER"))
-	// if err != nil {
-	// 	logrus.Fatal(err)
-	// }
+	provs := map[string]models.Provider{}
 
-	sessionPersister, err := helpers.NewBitCaskSessionPersister(viper.GetString("USER_DATA_FOLDER"))
+	var cookieSessionStore *sessions.CookieStore
+
+	preferencePersister, err := models.NewMapPreferencePersister()
 	if err != nil {
 		logrus.Fatal(err)
 	}
+	defer preferencePersister.ClosePersister()
 
-	// sessionPersister, _ := helpers.NewMapSessionPersister()
-	defer sessionPersister.Close()
+	resultPersister, err := models.NewBitCaskResultsPersister(viper.GetString("USER_DATA_FOLDER"))
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	defer resultPersister.CloseResultPersister()
+
+	// randID, _ := uuid.NewV4()
+	// cookieSessionStore = sessions.NewCookieStore(randID.Bytes())
+	saasBaseURL := viper.GetString("SAAS_BASE_URL")
+	// if saasBaseURL == "" {
+	// 	logrus.Fatalf("SAAS_BASE_URL environment variable not set.")
+	// }
+	lProv := &models.DefaultLocalProvider{
+		// SessionName: "meshery",
+		SaaSBaseURL: saasBaseURL,
+		// SessionStore: fileSessionStore,
+		// SessionStore:           cookieSessionStore,
+		MapPreferencePersister: preferencePersister,
+		ResultPersister:        resultPersister,
+	}
+	provs[lProv.Name()] = lProv
+
+	cPreferencePersister, err := models.NewBitCaskPreferencePersister(viper.GetString("USER_DATA_FOLDER"))
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	defer preferencePersister.ClosePersister()
+
+	cookieSessionStore = sessions.NewCookieStore([]byte("Meshery"))
+	// saasBaseURL := viper.GetString("SAAS_BASE_URL")
+	if saasBaseURL == "" {
+		logrus.Fatalf("SAAS_BASE_URL environment variable not set.")
+	}
+	cp := &models.MesheryRemoteProvider{
+		SaaSBaseURL:   saasBaseURL,
+		RefCookieName: "meshery_ref",
+		SessionName:   "meshery",
+		// SessionStore: fileSessionStore,
+		SessionStore:               cookieSessionStore,
+		SaaSTokenName:              "meshery_saas",
+		LoginCookieDuration:        1 * time.Hour,
+		BitCaskPreferencePersister: cPreferencePersister,
+	}
+	cp.SyncPreferences()
+	defer cp.StopSyncPreferences()
+	provs[cp.Name()] = cp
 
 	h := handlers.NewHandlerInstance(&models.HandlerConfig{
-		SaaSBaseURL: saasBaseURL,
-
-		RefCookieName: "meshery_ref",
-
-		SessionName: "meshery",
-		// SessionStore: fileSessionStore,
-		SessionStore: cookieSessionStore,
-
-		SaaSTokenName: "meshery_saas",
+		Providers:              provs,
+		ProviderCookieName:     "meshery-provider",
+		ProviderCookieDuration: 30 * 24 * time.Hour,
 
 		AdapterTracker: adapterTracker,
 		QueryTracker:   queryTracker,
 
 		Queue: mainQueue,
-
-		SessionPersister: sessionPersister,
 
 		KubeConfigFolder: viper.GetString("KUBECONFIG_FOLDER"),
 
@@ -117,13 +151,6 @@ func main() {
 
 	port := viper.GetInt("PORT")
 	r := router.NewRouter(ctx, h, port)
-
-	// go func() {
-	// 	err := mainQueue.Consumer().Start()
-	// 	if err != nil {
-	// 		logrus.Fatal(err)
-	// 	}
-	// }()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

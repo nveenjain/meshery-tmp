@@ -6,7 +6,6 @@ require (
 	fortio.org/fortio v1.3.1
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/aspenmesh/istio-client-go v0.0.0-20191010215625-4de6e89009c4
-	github.com/dgraph-io/badger v1.6.0
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0 // indirect
@@ -38,6 +37,8 @@ require (
 	golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 	google.golang.org/grpc v1.23.1
+	gopkg.in/yaml.v2 v2.2.2
+	k8s.io/api v0.0.0-20190620084959-7cf5895f2711
 	k8s.io/apimachinery v0.0.0-20190612205821-1799e75a0719
 	k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
 	k8s.io/utils v0.0.0-20191010214722-8d271d903fe4 // indirect

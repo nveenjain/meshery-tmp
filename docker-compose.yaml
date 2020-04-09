@@ -6,10 +6,9 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
       - "SAAS_BASE_URL=https://meshery.layer5.io"
-      - "ADAPTER_URLS=meshery-istio:10000 meshery-linkerd:10001 meshery-consul:10002 meshery-octarine:10003 meshery-nsm:10004"
+      - "ADAPTER_URLS=meshery-istio:10000 meshery-linkerd:10001 meshery-consul:10002 meshery-octarine:10003 meshery-nsm:10004 meshery-cpx:10008"
       - "EVENT=mesheryLocal"
     volumes:
-      - meshery-config:/home/appuser/.meshery/config
       - $HOME/.kube:/home/appuser/.kube:ro
     ports:
       - "9081:8080"
@@ -43,6 +42,14 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
     ports:
       - "10004:10004"
+  meshery-cpx:
+    image: layer5/meshery-cpx
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    #environment:
+    #  - "DEBUG=true"
+    ports:
+      - "10008:10008"
   watchtower:
     image: v2tec/watchtower
     labels:

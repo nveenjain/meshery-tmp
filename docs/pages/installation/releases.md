@@ -13,36 +13,113 @@ A list of the [releases of Meshery](https://github.com/layer5io/meshery/releases
     <th style="white-space: nowrap;">Release Date</th>
   </thead>
   <tbody>
+      <tr>
+      <td class="centered">0.3.11</td>
+      <td>
+        <em>Mesheryctl</em> - Fixes minor user experience issues on mesheryctl perf command. See Meshery CLI Commands & Documentation for reference.
+      </td>
+      <td>Mar 25, 2020</td>
+    </tr>
+      <tr>
+      <td class="centered">0.3.10</td>
+      <td>
+        <em>Mesheryctl</em> - Introduces mesheryctl perf command. See Meshery CLI Commands & Documentation for reference.
+      </td>
+      <td>Mar 9, 2020</td>
+    </tr>
+      <tr>
+      <td class="centered">0.3.9</td>
+      <td>
+        <em>Mesheryctl</em> - Addition of mesheryctl version to provide server-side version number, Improvement of mesheryctl logs | stop | start to provide appropriate grammar in situations when Meshery is stopped or Docker is not present.
+        <em>Meshery</em> - Striped off extraneous information beyond IP address and port in Grafana and Prometheus endpoints. 
+      </td>
+      <td>Feb 3, 2020</td>
+    </tr>
+    <tr>
+      <td class="centered">0.3.8</td>
+      <td>
+        <em>Mesheryctl</em> - Extraneous command line output removed. Clarity of CLI interaction with mesheryctl is improved in this release.
+      </td>
+      <td>Jan 17, 2020</td>
+    </tr>
+    <tr>
+      <td class="centered">0.3.7</td>
+      <td>
+        <em>Meshery</em> - Ad-hoc connectivity tests for Prometheus is now supported. Users can click the Prometheus chip and have Meshery verify its ability to connect to the configured Prometheus instance.
+      </td>
+      <td>Jan 15, 2020</td>
+    </tr>
+     <tr>
+      <td class="centered">0.3.6</td>
+      <td>
+        <em>Meshery</em> - Ad-hoc connectivity tests for Grafana is now supported. Users can click the Grafana chip and have Meshery verify its ability to connect to the configured Grafana instance.
+      </td>
+      <td>Jan 12, 2020</td>
+    </tr>
+     <tr>
+      <td class="centered">0.3.5</td>
+      <td>
+        <em>Mesheryctl</em> - Removal of init as a command exposed to users. This command's functionality is used internal to mesheryctl start. A new start --check command will provide preflight check functionality in init's place.
+      </td>
+      <td>Jan 12, 2020</td>
+    </tr>
+     <tr>
+      <td class="centered">0.3.4</td>
+      <td>
+        <em>Mesheryctl</em> - mesheryctl version is now enhanced with the addition of displaying the git commit (sha) of the mesheryctl release. 
+      </td>
+      <td>Dec 30, 2019</td>
+    </tr>
+     <tr>
+      <td class="centered">0.3.3</td>
+      <td>
+        <em>Meshery</em> - Providers (a new project construct that allows users to select authentication, long-term storage, and so on provider). 
+      </td>
+      <td>Dec 20, 2019</td>
+    </tr>
+    <tr>
+      <td class="centered">0.3.2</td>
+      <td>
+        <em>Mesheryctl</em> - adds mesheryctl version as a new subcommand. 
+      </td>
+      <td>Nov 29, 2019</td>
+    </tr>
+    <tr>
+      <td class="centered">0.3.1</td>
+      <td>
+        <em>Meshery</em> - Support for wrk2 as an alternative load generator.
+      </td>
+      <td>Nov 12, 2019</td>
+    </tr>
+    <tr><td colspan="3"><strong>v0.3.0</strong></td></tr>
     <tr>
       <td class="centered">0.2.4</td>
       <td>
-
-<i>Meshery</i>
-  - Meshery adapter for Octarine released as stable.
-<br />
-<i>mesheryctl</i>
-  - now available through homebrew.
-<br />
-<i>Documentation</i>
- - revised quick start for Mac, Linux _and_ Windows.
- - WSL2 support published.
- - GKE kubeconfig generation script switched to `--decode`.
-       </td>
-       <td>Nov 5, 2019</td>
+        <em>Meshery</em>
+          - Meshery adapter for Octarine released as stable.
+        <br />
+        <em>mesheryctl</em>
+          - now available through homebrew.
+        <br />
+        <em>Documentation</em>
+        - revised quick start for Mac, Linux _and_ Windows.
+        - WSL2 support published.
+        - GKE kubeconfig generation script switched to `--decode`.
+      </td>
+      <td>Nov 5, 2019</td>
     </tr>
     <tr>
       <td class="centered">0.2.3</td>
       <td>
-
-<i>mesheryctl</i>
-  - improved `status` output on Windows
-<br />
-<i>Meshery</i>
-  - Ability to deploy Meshery on Istio. 
-  - Adapter Chips: Move adapter port number into tooltip
-<br />
-<i>Docs</i>
-   - /search no longer redirecting to github.io.
+        <em>mesheryctl</em>
+          - improved `status` output on Windows
+        <br />
+        <em>Meshery</em>
+          - Ability to deploy Meshery on Istio. 
+          - Adapter Chips: Move adapter port number into tooltip
+        <br />
+        <em>Docs</em>
+          - /search no longer redirecting to github.io.
       </td>
       <td>Nov 3, 2019</td>
     </tr>
@@ -95,7 +172,7 @@ A list of the [releases of Meshery](https://github.com/layer5io/meshery/releases
     <tr><td colspan="3"><strong>v0.1.0</strong></td></tr>
     <tr>
       <td class="centered">0.0.9</td>
-      <td>Documentation site segragated and content laided out.</td>
+      <td>Documentation site segregated and content laided out.</td>
       <td>May 2, 2019</td>
     </tr>
     <tr>

@@ -24,22 +24,67 @@ import (
 	"github.com/spf13/viper"
 )
 
+//TerminalFormatter is exported
+type TerminalFormatter struct{}
+
 var cfgFile string
+
+var cmdDetails = `
+Meshery is the service mesh management plane, providing lifecycle, performance, and configuration management of service meshes and their workloads.
+
+Usage:
+  mesheryctl [command]
+
+Available Commands:
+  cleanup     Clean up Meshery
+  help        Help about any command
+  logs        Print logs
+  perf        Performance testing and benchmarking
+  start       Start Meshery
+  status      Check Meshery status
+  stop        Stop Meshery
+  update      Pull new Meshery images from Docker Hub
+  version     Version of mesheryctl
+
+Flags:
+      --config string   config file (default location is: $HOME/.meshery/config.yaml)
+  -h, --help            help for mesheryctl
+  -t, --toggle          Help message for toggle
+  -v, --version         Version of mesheryctl
+
+Use "mesheryctl [command] --help" for more information about a command.
+`
+
+//Format is exported
+func (f *TerminalFormatter) Format(entry *log.Entry) ([]byte, error) {
+	return append([]byte(entry.Message), '\n'), nil
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "mesheryctl",
 	Short: "Meshery Command Line tool",
-	Long:  `Meshery is a a multi-service mesh performance benchmark and playground tool`,
+	Long:  `Meshery is the service mesh management plane, providing lifecycle, performance, and configuration management of service meshes and their workloads.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		b, _ := cmd.Flags().GetBool("version")
+		if b {
+			versionCmd.Run(nil, nil)
+			return
+		}
+		if len(args) == 0 {
+			log.Print(cmdDetails)
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	fmt.Println("\n")
+	//log formatter for improved UX
+	log.SetFormatter(new(TerminalFormatter))
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -54,7 +99,7 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default location is: $HOME/.meshery/config.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default location is: "+dockerComposeFile+")")
 
 	// Preparing for an "edge" channel
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "edge", "", "flag to run Meshery as edge (one-time)")
@@ -62,6 +107,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolP("version", "v", false, "Version flag")
 }
 
 // initConfig reads in config file and ENV variables if set.

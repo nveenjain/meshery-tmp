@@ -1,4 +1,4 @@
-ADAPTER_URLS := "mesherylocal.layer5.io:10000 mesherylocal.layer5.io:10001 mesherylocal.layer5.io:10002 mesherylocal.layer5.io:10003 mesherylocal.layer5.io:10004"
+ADAPTER_URLS := "mesherylocal.layer5.io:10000 mesherylocal.layer5.io:10001 mesherylocal.layer5.io:10002 mesherylocal.layer5.io:10003 mesherylocal.layer5.io:10004 mesherylocal.layer5.io:10008"
 
 
 # Build the CLI for Meshery - `mesheryctl`.
@@ -10,14 +10,14 @@ mesheryctl:
 # `make docker` builds Meshery inside of a multi-stage Docker container.
 # This method does NOT require that you have Go, NPM, etc. installed locally.
 docker:
-	DOCKER_BUILDKIT=1 docker build -t layer5/meshery .
+	DOCKER_BUILDKIT=1 docker build -t layer5/meshery --build-arg TOKEN=$(GLOBAL_TOKEN) .
 
 # Runs Meshery in a container locally and points to locally-running 
 #  Meshery Cloud for user authentication.
 docker-run-local-cloud:
 	(docker rm -f meshery) || true
 	docker run --name meshery -d \
-	--link meshery-saas:meshery-saas \
+	--link meshery-cloud:meshery-cloud \
 	-e SAAS_BASE_URL="http://mesherylocal.layer5.io:9876" \
 	-e DEBUG=true \
 	-e ADAPTER_URLS=$(ADAPTER_URLS) \
@@ -70,14 +70,20 @@ proto:
 # Installs dependencies for building the user interface.
 setup-ui-libs:
 	cd ui; npm i; cd ..
+	cd provider-ui; npm i; cd ..
 
-# Runs the UI interface on your local machine.
+# Runs the Meshery UI interface on your local machine.
 run-ui-dev:
 	cd ui; npm run dev; cd ..
 
-# Builds the user interface on your local machine.
+# Runs the Provider UI interface on your local machine.
+run-provider-ui-dev:
+	cd provider-ui; npm run dev; cd ..
+
+# Builds all user interfaces on your local machine.
 build-ui:
 	cd ui; npm run build && npm run export; cd ..
+	cd provider-ui; npm run build && npm run export; cd ..
   
 # setup wrk2 for local dev 
 # NOTE: setup-wrk does not work on Mac Catalina at the moment
