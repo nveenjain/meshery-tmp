@@ -8,8 +8,7 @@ jobs:
     - name: Notify slack
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        STARS: $(curl -s https://github.com/layer5io/meshery | nokogiri -e 'puts $_.search('\''a'\'').text' | sed -n 95p | awk '{print $1}')"
       uses: pullreminders/slack-action@master
       with:
         run: STAR="$(curl -s https://github.com/layer5io/meshery-tmp | nokogiri -e 'puts $_.search('\''a'\'').text' | sed -n 95p | awk '{print $1}')"
-        args: '{\"channel\":\"CSK7N9TGX\",\"text\":\"Someone just starred Meshery! (https://github.com/layer5io/meshery/stargazers)\":\"\Now we are at ${{STARS}} stars"}'
+        echo: '{\"channel\":\"CSK7N9TGX\",\"text\":\"Someone just starred Meshery! (https://github.com/layer5io/meshery/stargazers)\":\"\Now we are at ${{STARS}} stars"}'
