@@ -67,6 +67,6 @@
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-react-hooks": "^2.4.0",
     "http-proxy": "^1.17.0",
-    "nodemon": "^1.19.4"
+    "nodemon": "^2.0.3"
   }
 }
