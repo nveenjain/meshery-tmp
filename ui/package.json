@@ -28,7 +28,7 @@
     "caniuse-lite": "^1.0.30001015",
     "classnames": "^2.2.6",
     "codemirror": "^5.49.2",
-    "eslint-loader": "^3.0.3",
+    "eslint-loader": "^4.0.0",
     "immutable": "^4.0.0-rc.12",
     "isomorphic-unfetch": "^3.0.0",
     "js-yaml": "^3.13.1",
