@@ -14,5 +14,5 @@ jobs:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       uses: pullreminders/slack-action@master
       with:
-        args: '{\"channel\":\"CSK7N9TGX\",\"text\":\"Someone just starred Meshery! (https://github.com/layer5io/meshery/stargazers) Total stars: \",\"text\":\"$(echo -n curl --silent https://api.github.com/repos/layer5io/meshery -H \"Accept: application/vnd.github.preview\" | jq \".watchers_count\")\"}'
+        args: '{\"channel\":\"CSK7N9TGX\",\"text\":\"Someone just starred Meshery! (https://github.com/layer5io/meshery/stargazers) Total stars: \",\"text\":\"env.$STARS\"}'
         
