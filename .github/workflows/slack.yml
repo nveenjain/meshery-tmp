@@ -5,12 +5,13 @@ jobs:
     name: Notify slack on star
     runs-on: ubuntu-latest
     steps:
+    - name: Get current star count
+      id: starcount
+      run: |
+        echo ::set-env name=STARS::$(echo -n curl --silent 'https://api.github.com/repos/layer5io/meshery' -H 'Accept: application/vnd.github.preview' | jq '.watchers_count'):  
     - name: Notify slack
       env:
-        id: slack
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        run: |
-          echo ::set-env name=STARS::$(echo -n curl --silent 'https://api.github.com/repos/layer5io/meshery' -H 'Accept: application/vnd.github.preview' | jq '.watchers_count'):  
       uses: pullreminders/slack-action@master
       with:
         args: '{\"channel\":\"CSK7N9TGX\",\"text\":\"Someone just starred Meshery! (https://github.com/layer5io/meshery/stargazers) Total stars: $env.STARS\"}'
